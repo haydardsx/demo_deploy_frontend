@@ -1,0 +1,9 @@
+{
+  "server1Url": "http://localhost:3000",
+  "server2Url": "http://localhost:3001",
+  "weightedUrl": "http://localhost:3002",
+  "weight1": 50,
+  "weight2": 50,
+  "sampleCount": 1000,
+  "buildRevision": "development"
+}

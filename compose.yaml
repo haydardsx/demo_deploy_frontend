@@ -1,0 +1,11 @@
+services:
+  frontend:
+    build: .
+    ports: ["127.0.0.1:8080:80"]
+    environment:
+      DEMO_SERVER1_URL: ${DEMO_SERVER1_URL:-http://localhost:3000}
+      DEMO_SERVER2_URL: ${DEMO_SERVER2_URL:-http://localhost:3001}
+      DEMO_WEIGHTED_URL: ${DEMO_WEIGHTED_URL:-http://localhost:3002}
+      DEMO_EXPECTED_WEIGHT1: ${DEMO_EXPECTED_WEIGHT1:-50}
+      DEMO_EXPECTED_WEIGHT2: ${DEMO_EXPECTED_WEIGHT2:-50}
+      DEMO_SAMPLE_COUNT: ${DEMO_SAMPLE_COUNT:-1000}
