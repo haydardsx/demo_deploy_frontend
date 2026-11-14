@@ -9,6 +9,8 @@ RUN npm run build
 
 FROM nginx:stable-alpine
 RUN apk add --no-cache jq
+# OPS 在受限执行器中运行容器，/run 可能不可写；将 Nginx PID 放到容器临时目录。
+RUN sed -i -E 's#pid[[:space:]]+[^;]+;#pid /tmp/nginx.pid;#' /etc/nginx/nginx.conf
 ARG BUILD_REVISION=development
 ENV BUILD_REVISION=$BUILD_REVISION
 COPY --from=build /app/dist /usr/share/nginx/html
