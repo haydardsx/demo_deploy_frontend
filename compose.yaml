@@ -1,0 +1,8 @@
+services:
+  frontend:
+    build: .
+    ports: ["127.0.0.1:8080:80"]
+    environment:
+      DEMO_SERVER1_URL: ${DEMO_SERVER1_URL:-http://localhost:3000}
+      DEMO_SERVER2_URL: ${DEMO_SERVER2_URL:-http://localhost:3001}
+      DEMO_GATEWAY_URL: ${DEMO_GATEWAY_URL:-http://localhost:3002}

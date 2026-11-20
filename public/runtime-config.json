@@ -1,0 +1,6 @@
+{
+  "server1Url": "http://localhost:3000",
+  "server2Url": "http://localhost:3001",
+  "gatewayUrl": "http://localhost:3002",
+  "buildRevision": "development"
+}
