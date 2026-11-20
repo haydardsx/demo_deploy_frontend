@@ -26,11 +26,11 @@ jobs:
           import json, os, re
           with open(os.environ["GITHUB_EVENT_PATH"]) as event:
               title = json.load(event)["pull_request"]["title"]
-          pattern = r"(?:feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(?:\((?P<scope>[a-z0-9-]+)\))?!?: (?P<summary>\S[^\r\n]*)"
+          pattern = r"(?:feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)\((?P<scope>[a-z0-9-]+)\)!?: (?P<summary>\S[^\r\n]*)"
           match = re.fullmatch(pattern, title)
           scopes = "app frontend demo config deps docs test ci docker".split()
           placeholders = {"update", "fix", "wip", "tmp", "test", "change", "updates", "changes", "todo", "修改", "更新", "测试", "修复"}
-          if not match or not title.isprintable() or len(title) > 100 or (match["scope"] and match["scope"] not in scopes):
+          if not match or not title.isprintable() or len(title) > 100 or match["scope"] not in scopes:
               raise SystemExit("Use a Conventional Commit title with a supported scope.")
           summary = match["summary"]
           words = "".join(ch for ch in summary.casefold() if ch.isalnum())
