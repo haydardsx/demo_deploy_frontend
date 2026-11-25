@@ -28,4 +28,13 @@ npm run dev
 
 Open `http://localhost:5173`. The development server reads the local endpoints from `public/runtime-config.json`.
 
+## Checks before committing
+
+With Python 3, Node.js and Docker available, run the same checks as CI and install the Git hooks.
+
+    python3 scripts/check.py
+    python3 scripts/check_staged.py --install
+
+The hooks check the staged snapshot and commit title. Use a branch such as `feat/deployment-check`, a Conventional Commit title with this repository’s scope, and the project email for both Git identities.
+
 [MIT license](LICENSE)

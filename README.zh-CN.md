@@ -28,4 +28,13 @@ npm run dev
 
 打开 `http://localhost:5173`。开发服务器从 `public/runtime-config.json` 读取本地服务地址。
 
+## 提交前检查
+
+准备 Python 3、Node.js 和 Docker，可运行与 CI 相同的工程检查并安装 Git 钩子。
+
+    python3 scripts/check.py
+    python3 scripts/check_staged.py --install
+
+钩子检查暂存快照与提交标题。从主线创建 `feat/deployment-check` 等用途分支，使用带本仓适用范围的 Conventional Commit 标题，提交作者和提交者均使用项目邮箱。
+
 [MIT 许可证](LICENSE)
