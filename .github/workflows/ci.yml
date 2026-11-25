@@ -23,47 +23,12 @@ jobs:
       - name: Verify pull request commit identities
         if: github.event_name == 'pull_request'
         run: python3 .github/scripts/check_maintainer.py
-      - name: 检查拉取请求标题
+      - name: 检查拉取请求分支和标题
         if: github.event_name == 'pull_request'
-        run: |
-          python3 - <<'PY'
-          import json, os, re
-          with open(os.environ["GITHUB_EVENT_PATH"]) as event:
-              title = json.load(event)["pull_request"]["title"]
-          pattern = r"(?:feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)\((?P<scope>[a-z0-9-]+)\)!?: (?P<summary>\S[^\r\n]*)"
-          match = re.fullmatch(pattern, title)
-          scopes = "app frontend demo config deps docs test ci docker".split()
-          placeholders = {"update", "fix", "wip", "tmp", "test", "change", "updates", "changes", "todo", "修改", "更新", "测试", "修复"}
-          if not match or not title.isprintable() or len(title) > 100 or match["scope"] not in scopes:
-              raise SystemExit("Use a Conventional Commit title with a supported scope.")
-          summary = match["summary"]
-          words = "".join(ch for ch in summary.casefold() if ch.isalnum())
-          if summary != summary.strip() or sum(ch.isalnum() for ch in summary) < 2 or words in placeholders:
-              raise SystemExit("Describe the change in the pull request title.")
-          PY
-      - name: Check source and README links
-        run: |
-          grep -Fq '(README.zh-CN.md)' README.md
-          grep -Fq '(README.md)' README.zh-CN.md
-          snapshot="$(mktemp -d)"
-          trap 'rm -rf "$snapshot"' EXIT
-          git archive HEAD | tar -x -C "$snapshot"
-          docker run --rm -v "$snapshot:/src:ro" ghcr.io/gitleaks/gitleaks@sha256:691af3c7c5a48b16f187ce3446d5f194838f91238f27270ed36eef6359a574d9 dir /src --redact=100 --no-banner
+        run: python3 .github/scripts/check_subjects.py --pull-request
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
-      - run: npm test
-      - run: npm run test:runtime
-      - run: npm run build
-      - run: npm audit --omit=dev --audit-level=high
-      - name: 验证镜像与运行配置
-        run: |
-          docker build --build-arg BUILD_REVISION="$GITHUB_SHA" -t ops-demo-frontend .
-          docker run -d --name frontend -p 8080:80 -e DEMO_SERVER1_URL=https://server1.example.com -e DEMO_SERVER2_URL=https://server2.example.com -e DEMO_GATEWAY_URL=https://gateway.example.com ops-demo-frontend
-          for attempt in $(seq 1 30); do curl --fail http://localhost:8080/health && break; sleep 1; done
-          curl --fail http://localhost:8080/runtime-config.json | jq -e --arg revision "$GITHUB_SHA" '.server1Url == "https://server1.example.com" and .server2Url == "https://server2.example.com" and .gatewayUrl == "https://gateway.example.com" and .buildRevision == $revision and (keys | sort) == ["buildRevision","gatewayUrl","server1Url","server2Url"]'
-          curl --fail http://localhost:8080/ | grep -q 'OPS'
-      - if: always()
-        run: docker rm -f frontend || true
+      - name: 运行与本地提交相同的工程检查
+        run: python3 scripts/check.py
